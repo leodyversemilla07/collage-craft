@@ -114,3 +114,7 @@ These scores are then used to keep stronger photos near the front of the layout 
 - No saved projects or persistent collage sessions
 - No manual photo pinning or drag-to-reorder yet
 - Scoring is intentionally simple and heuristic-based
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE` for details.
