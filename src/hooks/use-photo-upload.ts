@@ -1,5 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from "react"
 import type { Photo } from "@/types"
+import {
+  loadPersistedPhotos,
+  savePersistedPhotos,
+} from "@/lib/persisted-photos"
 
 const ACCEPTED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"])
 
@@ -43,6 +47,7 @@ async function readPhotoFile(file: File): Promise<Photo | null> {
 
 export function usePhotoUpload() {
   const [photos, setPhotos] = useState<Photo[]>([])
+  const [isHydrated, setIsHydrated] = useState(false)
   const photosRef = useRef<Photo[]>([])
 
   useEffect(() => {
@@ -54,6 +59,39 @@ export function usePhotoUpload() {
       revokePhotoUrls(photosRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+
+    loadPersistedPhotos().then((persistedPhotos) => {
+      if (cancelled) {
+        revokePhotoUrls(persistedPhotos)
+        return
+      }
+
+      setPhotos((current) => {
+        if (current.length > 0 || persistedPhotos.length === 0) {
+          revokePhotoUrls(persistedPhotos)
+          return current
+        }
+
+        return persistedPhotos
+      })
+      setIsHydrated(true)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isHydrated) {
+      return
+    }
+
+    void savePersistedPhotos(photos)
+  }, [isHydrated, photos])
 
   const addFiles = useCallback(async (files: File[]) => {
     const results = await Promise.all(files.map(readPhotoFile))
@@ -89,5 +127,5 @@ export function usePhotoUpload() {
     })
   }, [])
 
-  return { photos, addFiles, removePhoto, clearPhotos }
+  return { photos, addFiles, removePhoto, clearPhotos, isHydrated }
 }

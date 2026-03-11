@@ -30,6 +30,7 @@ export function App() {
     setCanvasPreset,
     setDensity,
     setTitle,
+    swapTiles,
   } = useCollage(photos)
   const { isExporting, exportCollage } = useCanvasExport()
   const isDark = useIsDark()
@@ -197,6 +198,7 @@ export function App() {
             settings={settings}
             imageMap={imageMap}
             isDark={isDark}
+            onSwapTiles={swapTiles}
           />
 
           {!drawerOpen && (
