@@ -11,6 +11,33 @@ function revokePhotoUrls(photos: Photo[]) {
   photos.forEach((photo) => URL.revokeObjectURL(photo.previewUrl))
 }
 
+function getPhotoDedupKey(photo: Pick<Photo, "name" | "fileSize">): string {
+  return `${photo.name}-${photo.fileSize}`
+}
+
+export function splitFreshAndDuplicatePhotos(
+  existingPhotos: Pick<Photo, "name" | "fileSize">[],
+  incomingPhotos: Photo[]
+): { fresh: Photo[]; duplicates: Photo[] } {
+  const knownKeys = new Set(existingPhotos.map(getPhotoDedupKey))
+  const fresh: Photo[] = []
+  const duplicates: Photo[] = []
+
+  for (const photo of incomingPhotos) {
+    const key = getPhotoDedupKey(photo)
+
+    if (knownKeys.has(key)) {
+      duplicates.push(photo)
+      continue
+    }
+
+    knownKeys.add(key)
+    fresh.push(photo)
+  }
+
+  return { fresh, duplicates }
+}
+
 async function readPhotoFile(file: File): Promise<Photo | null> {
   if (!ACCEPTED_TYPES.has(file.type)) return null
 
@@ -99,14 +126,9 @@ export function usePhotoUpload() {
     if (valid.length === 0) return
 
     setPhotos((prev) => {
-      // Deduplicate by file name + size to prevent double uploads
-      const existingKeys = new Set(prev.map((p) => `${p.name}-${p.fileSize}`))
-      const fresh = valid.filter(
-        (p) => !existingKeys.has(`${p.name}-${p.fileSize}`)
-      )
-      const duplicates = valid.filter((p) =>
-        existingKeys.has(`${p.name}-${p.fileSize}`)
-      )
+      // Deduplicate by file name + size to prevent double uploads.
+      // Track accepted keys as we iterate so duplicates in the same batch are dropped.
+      const { fresh, duplicates } = splitFreshAndDuplicatePhotos(prev, valid)
       revokePhotoUrls(duplicates)
       return [...prev, ...fresh]
     })

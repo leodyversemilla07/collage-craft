@@ -10,6 +10,8 @@ A web application that automatically generates polished photo collages in the br
 - **3 layout styles** — Magazine (editorial hero), Grid (clean uniform), Scrapbook (playful rotated)
 - **Heuristic photo scoring** — ranks images by resolution, aspect ratio, file size, and orientation diversity
 - **Live preview** — collage updates instantly as you change settings
+- **Drag-to-swap** — reorder photos directly on the canvas by dragging one tile onto another
+- **Local persistence** — uploaded photos are restored from IndexedDB after a reload on the same device
 - **Export** — download as a high-quality 2× PNG
 - **Theme toggle** — switch between light, dark, and system modes
 - **Export feedback** — Sonner toasts confirm export progress and failures
@@ -74,6 +76,8 @@ src/
 │   ├── constants.ts          # Canvas presets, density gaps, default settings
 │   ├── scoring.ts            # Photo scoring module and ranking helpers
 │   ├── layout-engine.ts      # Grid / Magazine / Scrapbook layout generators
+│   ├── persisted-photos.ts   # IndexedDB persistence for uploaded photos
+│   ├── tile-assignments.ts   # Drag-to-swap photo assignment helpers
 │   └── canvas-renderer.ts    # Canvas 2D rendering + PNG export
 ├── hooks/
 │   ├── use-photo-upload.ts   # Object URL creation, drag-drop, Photo object creation
@@ -82,7 +86,7 @@ src/
 │   └── use-is-dark.ts        # Resolved dark-mode boolean (handles "system" setting)
 ├── components/
 │   ├── canvas/
-│   │   ├── collage-canvas.tsx # <canvas> element + live re-render
+│   │   ├── collage-canvas.tsx # <canvas> element + live re-render + drag-to-swap
 │   │   └── empty-state.tsx    # Placeholder before photos are uploaded
 │   ├── controls/
 │   │   ├── controls-panel.tsx # Full sidebar assembly
@@ -91,7 +95,7 @@ src/
 │   └── upload/
 │       ├── upload-zone.tsx    # Drag-and-drop area
 │       └── photo-strip.tsx    # Scrollable thumbnail row
-└── app.tsx                    # Top-level layout and state wiring
+└── App.tsx                    # Top-level layout and state wiring
 ```
 
 ## How photo scoring works
@@ -111,8 +115,8 @@ These scores are then used to keep stronger photos near the front of the layout 
 ## Current limitations
 
 - No backend or cloud sync; everything runs locally in the browser
-- No saved projects or persistent collage sessions
-- No manual photo pinning or drag-to-reorder yet
+- Uploaded photos persist locally, but full project state and settings are not saved yet
+- No manual photo pinning beyond drag-to-swap reassignment
 - Scoring is intentionally simple and heuristic-based
 
 ## License
