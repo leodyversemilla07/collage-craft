@@ -19,6 +19,7 @@ function createPhoto(index: number, score: number): Photo {
     orientation: "landscape",
     fileSize: 1_000_000 + index,
     score,
+    isPinned: false,
   }
 }
 
@@ -50,6 +51,23 @@ describe("generateLayout", () => {
       "photo-2",
       "photo-4",
       "photo-3",
+    ])
+  })
+
+  test("places pinned photos ahead of score-based featured positions", () => {
+    const photos = [
+      createPhoto(1, 0.99),
+      { ...createPhoto(2, 0.2), isPinned: true },
+      { ...createPhoto(3, 0.1), isPinned: true },
+      createPhoto(4, 0.8),
+    ]
+
+    const layout = generateLayout(photos, createSettings({ style: "grid" }), 42)
+
+    expect(layout.tiles.slice(0, 3).map((tile) => tile.photoId)).toEqual([
+      "photo-2",
+      "photo-3",
+      "photo-1",
     ])
   })
 

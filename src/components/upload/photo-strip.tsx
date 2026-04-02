@@ -1,5 +1,12 @@
 import { useRef, useState, useEffect, useCallback } from "react"
-import { X, Trash, CaretLeft, CaretRight } from "@phosphor-icons/react"
+import {
+  X,
+  Trash,
+  CaretLeft,
+  CaretRight,
+  PushPin,
+  PushPinSlash,
+} from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import type { Photo } from "@/types"
@@ -8,9 +15,15 @@ interface PhotoStripProps {
   photos: Photo[]
   onRemove: (id: string) => void
   onClear: () => void
+  onTogglePinned: (id: string) => void
 }
 
-export function PhotoStrip({ photos, onRemove, onClear }: PhotoStripProps) {
+export function PhotoStrip({
+  photos,
+  onRemove,
+  onClear,
+  onTogglePinned,
+}: PhotoStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
@@ -41,15 +54,20 @@ export function PhotoStrip({ photos, onRemove, onClear }: PhotoStripProps) {
         <span className="text-xs text-muted-foreground">
           {photos.length} photo{photos.length !== 1 ? "s" : ""}
         </span>
-        <Button
-          variant="ghost"
-          size="xs"
-          onClick={onClear}
-          className="h-5 gap-1 text-xs"
-        >
-          <Trash size={11} />
-          Clear all
-        </Button>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-muted-foreground/70">
+            {photos.filter((photo) => photo.isPinned).length} pinned
+          </span>
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={onClear}
+            className="h-5 gap-1 text-xs"
+          >
+            <Trash size={11} />
+            Clear all
+          </Button>
+        </div>
       </div>
 
       <div className="relative">
@@ -86,8 +104,36 @@ export function PhotoStrip({ photos, onRemove, onClear }: PhotoStripProps) {
               <img
                 src={photo.previewUrl}
                 alt={photo.name}
-                className="h-14 w-14 rounded-md object-cover ring-1 ring-border/50"
+                className={cn(
+                  "h-14 w-14 rounded-md object-cover ring-1 ring-border/50 transition-all",
+                  photo.isPinned && "ring-2 ring-primary/60"
+                )}
               />
+              <button
+                onClick={() => onTogglePinned(photo.id)}
+                className={cn(
+                  "absolute top-1 left-1 z-10 flex h-5 w-5 items-center justify-center rounded-full border border-border/60 bg-background/90 text-foreground/70 backdrop-blur-sm transition-all",
+                  photo.isPinned
+                    ? "opacity-100"
+                    : "opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+                )}
+                aria-label={
+                  photo.isPinned
+                    ? `Unpin ${photo.name} from featured positions`
+                    : `Pin ${photo.name} to featured positions`
+                }
+                title={
+                  photo.isPinned
+                    ? "Pinned to featured positions"
+                    : "Pin to featured positions"
+                }
+              >
+                {photo.isPinned ? (
+                  <PushPinSlash size={10} weight="fill" />
+                ) : (
+                  <PushPin size={10} weight="fill" />
+                )}
+              </button>
               <button
                 onClick={() => onRemove(photo.id)}
                 className={cn(
@@ -106,6 +152,11 @@ export function PhotoStrip({ photos, onRemove, onClear }: PhotoStripProps) {
                   <span className="font-mono text-[9px]">
                     {(photo.score * 100).toFixed(0)}
                   </span>
+                </div>
+              )}
+              {photo.isPinned && (
+                <div className="absolute right-0.5 bottom-0.5 rounded bg-primary px-1 py-px text-[9px] font-medium text-primary-foreground">
+                  Pin
                 </div>
               )}
             </div>

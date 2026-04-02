@@ -27,9 +27,14 @@ function shuffleWithSeed<T>(arr: T[], seed: number): T[] {
  */
 function orderForLayout(photos: Photo[], seed: number): Photo[] {
   const sorted = [...photos].sort((a, b) => b.score - a.score);
-  const featured = sorted.slice(0, Math.min(3, sorted.length));
-  const rest = shuffleWithSeed(sorted.slice(featured.length), seed);
-  return [...featured, ...rest];
+  const pinned = sorted.filter((photo) => photo.isPinned);
+  const unpinned = sorted.filter((photo) => !photo.isPinned);
+  const featuredUnpinned = unpinned.slice(
+    0,
+    Math.max(0, Math.min(3, sorted.length) - pinned.length),
+  );
+  const remainingUnpinned = shuffleWithSeed(unpinned.slice(featuredUnpinned.length), seed);
+  return [...pinned, ...featuredUnpinned, ...remainingUnpinned];
 }
 
 function gridDimensions(n: number): { cols: number; rows: number } {

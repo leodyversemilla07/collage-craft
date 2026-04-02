@@ -24,6 +24,7 @@ interface ControlsPanelProps {
   onAddFiles: (files: File[]) => void
   onRemovePhoto: (id: string) => void
   onClearPhotos: () => void
+  onTogglePinned: (id: string) => void
   onStyleChange: (style: CollageStyle) => void
   onPresetChange: (preset: CanvasPreset) => void
   onDensityChange: (density: CollageDensity) => void
@@ -43,6 +44,7 @@ export function ControlsPanel({
   onAddFiles,
   onRemovePhoto,
   onClearPhotos,
+  onTogglePinned,
   onStyleChange,
   onPresetChange,
   onDensityChange,
@@ -66,6 +68,7 @@ export function ControlsPanel({
           photos={photos}
           onRemove={onRemovePhoto}
           onClear={onClearPhotos}
+          onTogglePinned={onTogglePinned}
         />
       </section>
 

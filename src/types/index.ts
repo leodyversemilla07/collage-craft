@@ -21,6 +21,8 @@ export interface Photo {
   fileSize: number
   /** Normalized 0–1 score assigned by the scoring module. */
   score: number
+  /** Pinned photos are kept at the front of generated layouts. */
+  isPinned: boolean
 }
 
 export interface LayoutTile {

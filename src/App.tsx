@@ -19,7 +19,8 @@ import { cn } from "@/lib/utils"
 import type { CanvasPreset, CollageDensity, CollageStyle } from "@/types"
 
 export function App() {
-  const { photos, addFiles, removePhoto, clearPhotos } = usePhotoUpload()
+  const { photos, addFiles, removePhoto, clearPhotos, togglePinned } =
+    usePhotoUpload()
   const {
     layout,
     settings,
@@ -112,6 +113,7 @@ export function App() {
     onAddFiles: addFiles,
     onRemovePhoto: removePhoto,
     onClearPhotos: clearPhotos,
+    onTogglePinned: togglePinned,
     onStyleChange: (style: CollageStyle) => setStyle(style),
     onPresetChange: (preset: CanvasPreset) => setCanvasPreset(preset),
     onDensityChange: (density: CollageDensity) => setDensity(density),

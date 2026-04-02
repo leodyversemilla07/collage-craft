@@ -60,6 +60,7 @@ async function readPhotoFile(file: File): Promise<Photo | null> {
         orientation: ar > 1.1 ? "landscape" : ar < 0.9 ? "portrait" : "square",
         fileSize: file.size,
         score: 0,
+        isPinned: false,
       })
     }
 
@@ -149,5 +150,13 @@ export function usePhotoUpload() {
     })
   }, [])
 
-  return { photos, addFiles, removePhoto, clearPhotos, isHydrated }
+  const togglePinned = useCallback((id: string) => {
+    setPhotos((prev) =>
+      prev.map((photo) =>
+        photo.id === id ? { ...photo, isPinned: !photo.isPinned } : photo
+      )
+    )
+  }, [])
+
+  return { photos, addFiles, removePhoto, clearPhotos, togglePinned, isHydrated }
 }

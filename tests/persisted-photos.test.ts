@@ -24,6 +24,7 @@ function createPhoto(overrides: Partial<Photo> = {}): Photo {
     orientation: overrides.orientation ?? "landscape",
     fileSize: overrides.fileSize ?? file.size,
     score: overrides.score ?? 0.75,
+    isPinned: overrides.isPinned ?? false,
   }
 }
 
@@ -40,6 +41,7 @@ describe("persisted photos", () => {
       aspectRatio: 1.5,
       orientation: "landscape",
       fileSize: 5,
+      isPinned: false,
     })
   })
 
@@ -53,6 +55,7 @@ describe("persisted photos", () => {
       aspectRatio: 1.5,
       orientation: "landscape",
       fileSize: 5,
+      isPinned: true,
     }
 
     const originalCreateObjectUrl = URL.createObjectURL
@@ -71,6 +74,7 @@ describe("persisted photos", () => {
         orientation: "landscape",
         fileSize: 5,
         score: 0,
+        isPinned: true,
       })
     } finally {
       URL.createObjectURL = originalCreateObjectUrl

@@ -14,6 +14,7 @@ export interface PersistedPhotoRecord {
   aspectRatio: number
   orientation: Photo["orientation"]
   fileSize: number
+  isPinned: boolean
 }
 
 function supportsIndexedDb(): boolean {
@@ -79,6 +80,7 @@ export function serializePhoto(photo: Photo): PersistedPhotoRecord {
     aspectRatio: photo.aspectRatio,
     orientation: photo.orientation,
     fileSize: photo.fileSize,
+    isPinned: photo.isPinned,
   }
 }
 
